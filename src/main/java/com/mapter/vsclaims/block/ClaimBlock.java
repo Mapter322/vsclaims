@@ -1,0 +1,127 @@
+package com.mapter.vsclaims.block;
+
+import com.mapter.vsclaims.claim.Claim;
+import com.mapter.vsclaims.claim.ClaimManager;
+import com.mapter.vsclaims.ship.RegisteredShipsManager;
+import com.mapter.vsclaims.ship.UnregisteredShipsManager;
+import com.mapter.vsclaims.ship.VSShipUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.network.NetworkHooks;
+import net.minecraft.world.SimpleMenuProvider;
+
+import javax.annotation.Nullable;
+
+public class ClaimBlock extends BaseEntityBlock {
+
+    public ClaimBlock(Properties props) {
+        super(props);
+    }
+
+    @Override
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new ClaimBlockEntity(pos, state);
+    }
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state,
+                            @Nullable net.minecraft.world.entity.LivingEntity placer,
+                            net.minecraft.world.item.ItemStack stack) {
+        if (!level.isClientSide && placer instanceof Player player) {
+            ClaimManager.addClaim((ServerLevel) level, pos, player.getUUID());
+
+            Object ship = VSShipUtils.getShipAt((ServerLevel) level, pos);
+            if (ship instanceof Boolean) {
+                ship = VSShipUtils.getShipObjectAt((ServerLevel) level, pos);
+            }
+
+            String shipId = VSShipUtils.getShipId(ship);
+            if (shipId != null) {
+                String shipName = VSShipUtils.getShipSlug(ship);
+                if (shipName == null) shipName = "ship";
+                RegisteredShipsManager.registerShip(shipId, shipName, player.getUUID(), player.getName().getString());
+                UnregisteredShipsManager.removeShip(shipId);
+            }
+        }
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos,
+                         BlockState newState, boolean moving) {
+        if (!level.isClientSide && state.getBlock() != newState.getBlock()) {
+            Object ship = VSShipUtils.getShipAt((ServerLevel) level, pos);
+            if (ship instanceof Boolean) {
+                ship = VSShipUtils.getShipObjectAt((ServerLevel) level, pos);
+            }
+
+            String shipId = VSShipUtils.getShipId(ship);
+            if (shipId != null) {
+                String shipName = VSShipUtils.getShipSlug(ship);
+                if (shipName == null) shipName = "ship";
+                RegisteredShipsManager.unregisterShip(shipId);
+                UnregisteredShipsManager.addShip(shipId, shipName);
+            }
+            ClaimManager.removeClaim((ServerLevel) level, pos);
+        }
+        super.onRemove(state, level, pos, newState, moving);
+    }
+
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+                                 InteractionHand hand, BlockHitResult hit) {
+        if (level.isClientSide)
+            return InteractionResult.SUCCESS;
+
+        if (!(player instanceof ServerPlayer serverPlayer))
+            return InteractionResult.PASS;
+
+        Claim claim = ClaimManager.getClaimByCenter(serverPlayer.serverLevel(), pos);
+        if (claim == null)
+            return InteractionResult.PASS;
+
+        if (!serverPlayer.getUUID().equals(claim.getOwner())) {
+            serverPlayer.sendSystemMessage(Component.literal("§cТолько владелец может настраивать доступ"));
+            return InteractionResult.CONSUME;
+        }
+
+        Object ship = VSShipUtils.getShipAt(serverPlayer.serverLevel(), pos);
+        String shipId = VSShipUtils.getShipId(ship);
+
+        NetworkHooks.openScreen(serverPlayer,
+                new SimpleMenuProvider(
+                        (containerId, inv, p) -> new com.mapter.vsclaims.screen.ClaimSettingsMenu(
+                                containerId, inv, pos, claim.getOwner(),
+                                claim.isActive(),
+                                claim.isAllowParty(), claim.isAllowAllies(), claim.isAllowOthers()),
+                        Component.literal("Claim Settings")
+                ),
+                buf -> {
+                    buf.writeBlockPos(pos);
+                    buf.writeUUID(claim.getOwner());
+                    buf.writeBoolean(claim.isActive());
+                    buf.writeBoolean(claim.isAllowParty());
+                    buf.writeBoolean(claim.isAllowAllies());
+                    buf.writeBoolean(claim.isAllowOthers());
+                }
+        );
+
+        return InteractionResult.CONSUME;
+    }
+}

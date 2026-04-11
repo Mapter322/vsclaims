@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "vsclaims:block/claim_block"
+    }
+  }
+}
