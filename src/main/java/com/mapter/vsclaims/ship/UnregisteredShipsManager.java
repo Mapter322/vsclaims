@@ -15,18 +15,12 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Хранит корабли которые ещё не зарегистрированы игроком.
- * JSON: world/vsclaims/unregistered_ships.json
- *
- * Координаты — world-space, обновляются периодически через VSShipEventHandler.
- */
 @Mod.EventBusSubscriber
 public class UnregisteredShipsManager {
 
     private static final Logger LOGGER = LogManager.getLogger("vsclaims/UnregisteredShipsManager");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final String FILE_NAME = "unregistered_ships.json";
+    private static final String FILE_NAME = "unclaimed_ships.json";
 
     private static final Map<String, UnregisteredShip> ships = new ConcurrentHashMap<>();
     private static Path saveFile = null;

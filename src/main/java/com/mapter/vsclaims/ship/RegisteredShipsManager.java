@@ -56,7 +56,7 @@ public class RegisteredShipsManager {
             Files.createDirectories(vsclaimsDir.toPath());
         } catch (IOException ignored) {}
 
-        shipsDataFile = new File(vsclaimsDir, "registered_ships.json");
+        shipsDataFile = new File(vsclaimsDir, "claimed_ships.json");
         loadRegisteredShips();
     }
 
