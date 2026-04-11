@@ -48,7 +48,7 @@ public class RegisterShipPacket {
             LOGGER.info("Ship at pos: {}", ship);
 
             if (ship == null) {
-                player.sendSystemMessage(Component.literal("§cКорабль не найден на данной позиции!"));
+                player.sendSystemMessage(Component.translatable("message.vsclaims.ship_not_found_at_pos"));
                 return;
             }
 
@@ -61,7 +61,7 @@ public class RegisterShipPacket {
             }
 
             if (ship == null) {
-                player.sendSystemMessage(Component.literal("§cНе удалось получить объект корабля!"));
+                player.sendSystemMessage(Component.translatable("message.vsclaims.ship_object_not_found"));
                 return;
             }
 
@@ -70,7 +70,7 @@ public class RegisterShipPacket {
             LOGGER.info("shipId={} slug={}", shipId, slug);
 
             if (shipId == null) {
-                player.sendSystemMessage(Component.literal("§cНе удалось получить ID корабля!"));
+                player.sendSystemMessage(Component.translatable("message.vsclaims.ship_id_not_found"));
                 return;
             }
 
@@ -78,7 +78,7 @@ public class RegisterShipPacket {
 
             RegisteredShipsManager.registerShip(shipId, slug, player.getUUID(), player.getName().getString());
             UnregisteredShipsManager.removeShip(shipId);
-            player.sendSystemMessage(Component.literal("Корабль зарегистрирован: " + slug));
+            player.sendSystemMessage(Component.translatable("message.vsclaims.ship_registered", slug));
         });
         ctx.setPacketHandled(true);
     }

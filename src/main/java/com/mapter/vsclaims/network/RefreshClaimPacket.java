@@ -38,12 +38,12 @@ public class RefreshClaimPacket {
             if (!player.getUUID().equals(claim.getOwner())) return;
 
             if (!VSShipUtils.isOnShip(player.serverLevel(), msg.center)) {
-                player.sendSystemMessage(Component.literal("§cОбновление доступно только на корабле!"));
+                player.sendSystemMessage(Component.translatable("message.vsclaims.refresh_only_on_ship"));
                 return;
             }
 
             ClaimManager.refreshClaim(player.serverLevel(), msg.center);
-            player.sendSystemMessage(Component.literal("§aПриват активирован и границы обновлены"));
+            player.sendSystemMessage(Component.translatable("message.vsclaims.claim_refreshed"));
         });
         ctx.setPacketHandled(true);
     }

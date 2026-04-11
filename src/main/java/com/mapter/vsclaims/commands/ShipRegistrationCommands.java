@@ -31,19 +31,19 @@ public class ShipRegistrationCommands {
                                 .executes(ctx -> {
                                     CommandSourceStack source = ctx.getSource();
                                     if (!(source.getEntity() instanceof ServerPlayer player)) {
-                                        source.sendFailure(Component.literal("Эта команда доступна только игроку"));
+                                        source.sendFailure(Component.translatable("commands.vsclaims.only_player"));
                                         return 0;
                                     }
 
                                     Map<String, String> ships = RegisteredShipsManager.getRegisteredShips(player.getUUID());
                                     int current = ships.size();
 
-                                    source.sendSuccess(() -> Component.literal("Твои зарегистрированные корабли: " + current), false);
+                                    source.sendSuccess(() -> Component.translatable("commands.vsclaims.info.registered_count", current), false);
                                     if (ships.isEmpty()) {
-                                        source.sendSuccess(() -> Component.literal("Список пуст"), false);
+                                        source.sendSuccess(() -> Component.translatable("commands.vsclaims.info.empty"), false);
                                     } else {
                                         for (String name : ships.values()) {
-                                            source.sendSuccess(() -> Component.literal("- " + name), false);
+                                            source.sendSuccess(() -> Component.translatable("commands.vsclaims.info.entry", name), false);
                                         }
                                     }
 
@@ -57,7 +57,7 @@ public class ShipRegistrationCommands {
 
                                             int total = UnregisteredShipsManager.getCount();
                                             if (total == 0) {
-                                                source.sendSuccess(() -> Component.literal("Незарегистрированных кораблей нет"), true);
+                                                source.sendSuccess(() -> Component.translatable("commands.vsclaims.ships.clear.none"), true);
                                                 return 1;
                                             }
 
@@ -77,7 +77,7 @@ public class ShipRegistrationCommands {
                                             int finalDeleted = deleted;
                                             int finalFailed = failed;
                                             source.sendSuccess(
-                                                    () -> Component.literal("Удаление незарегистрированных кораблей завершено. Удалено: " + finalDeleted + ", не удалось удалить: " + finalFailed + ", всего было: " + total),
+                                                    () -> Component.translatable("commands.vsclaims.ships.clear.done", finalDeleted, finalFailed, total),
                                                     true
                                             );
                                             return 1;

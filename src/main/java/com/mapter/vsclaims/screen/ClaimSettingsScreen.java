@@ -71,7 +71,7 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
             sendUpdate();
         }).bounds(btnX, this.topPos + 68, btnW, 18).build();
 
-        this.refreshButton = Button.builder(Component.literal("Активировать/Обновить"), btn -> sendRefresh())
+        this.refreshButton = Button.builder(Component.translatable("screen.vsclaims.claim_settings.refresh"), btn -> sendRefresh())
                 .bounds(btnX, this.topPos + 90, btnW, 18).build();
 
         this.addRenderableWidget(this.partyButton);
@@ -81,21 +81,21 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
     }
 
     private Component getPartyText() {
-        return Component.literal(this.menu.isAllowParty()
-                ? "Группа:  §a✔ Разрешено"
-                : "Группа:  §c✘ Запрещено");
+        return Component.translatable(this.menu.isAllowParty()
+                ? "screen.vsclaims.claim_settings.party.allowed"
+                : "screen.vsclaims.claim_settings.party.denied");
     }
 
     private Component getAlliesText() {
-        return Component.literal(this.menu.isAllowAllies()
-                ? "Союзники:  §a✔ Разрешено"
-                : "Союзники:  §c✘ Запрещено");
+        return Component.translatable(this.menu.isAllowAllies()
+                ? "screen.vsclaims.claim_settings.allies.allowed"
+                : "screen.vsclaims.claim_settings.allies.denied");
     }
 
     private Component getOthersText() {
-        return Component.literal(this.menu.isAllowOthers()
-                ? "Остальные:  §a✔ Разрешено"
-                : "Остальные:  §c✘ Запрещено");
+        return Component.translatable(this.menu.isAllowOthers()
+                ? "screen.vsclaims.claim_settings.others.allowed"
+                : "screen.vsclaims.claim_settings.others.denied");
     }
 
     private void sendUpdate() {
@@ -114,7 +114,7 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
             this.menu.setClaimActive(true);
             lastRefreshTime = now;
             refreshButton.active = false;
-            refreshButton.setMessage(Component.literal("Подождите 30 сек..."));
+            refreshButton.setMessage(Component.translatable("screen.vsclaims.claim_settings.refresh_wait"));
         }
     }
 
@@ -128,7 +128,7 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
         // Координаты относительно угла фона (leftPos/topPos вычтены движком)
 
         // Заголовок по центру
-        String title = "Настройки привата";
+        String title = Component.translatable("screen.vsclaims.claim_settings.title").getString();
         g.drawString(this.font, title,
                 (this.imageWidth - this.font.width(title)) / 2, 7, COLOR_TITLE, false);
 
@@ -139,10 +139,13 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
         g.fill(10, 116, this.imageWidth - 10, 117, 0x66888888);
 
         // Статус привата
-        String statusText = this.menu.isClaimActive() ? "активен" : "отключен";
+        String statusText = Component.translatable(this.menu.isClaimActive()
+                ? "screen.vsclaims.claim_settings.status.active"
+                : "screen.vsclaims.claim_settings.status.disabled").getString();
         int statusColor = this.menu.isClaimActive() ? 0x22AA22 : 0xCC3333;
-        int prefixWidth = this.font.width("Приват: ");
-        g.drawString(this.font, "Приват: ", 10, 120, COLOR_LABEL, false);
+        String privacyPrefix = Component.translatable("screen.vsclaims.claim_settings.privacy_prefix").getString();
+        int prefixWidth = this.font.width(privacyPrefix);
+        g.drawString(this.font, privacyPrefix, 10, 120, COLOR_LABEL, false);
         g.drawString(this.font, statusText, 10 + prefixWidth, 120, statusColor, false);
 
         // Владелец
@@ -152,7 +155,7 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
                     .getPlayerInfo(menu.getOwner())
                     .getProfile()
                     .getName();
-            g.drawString(this.font, "Владелец: " + name, 10, 132, COLOR_LABEL, false);
+            g.drawString(this.font, Component.translatable("screen.vsclaims.claim_settings.owner", name).getString(), 10, 132, COLOR_LABEL, false);
         } catch (Exception ignored) {}
 
         // Корабль
@@ -160,7 +163,7 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
             try {
                 String slug = (String) ship.getClass().getMethod("getSlug").invoke(ship);
                 if (slug != null && !slug.isEmpty()) {
-                    Component shipText = Component.literal("Корабль: " + slug);
+                    Component shipText = Component.translatable("screen.vsclaims.claim_settings.ship", slug);
                     int x = 10;
                     int y = 146;
                     int maxWidth = this.imageWidth - 20;
@@ -182,7 +185,7 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
 
         if (!refreshButton.active && System.currentTimeMillis() - lastRefreshTime > 30000) {
             refreshButton.active = true;
-            refreshButton.setMessage(Component.literal("Активировать/Обновить"));
+            refreshButton.setMessage(Component.translatable("screen.vsclaims.claim_settings.refresh"));
         }
     }
 }

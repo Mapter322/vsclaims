@@ -47,7 +47,7 @@ public class ProtectionEvents {
         if (claim == null) return;
         if (!ClaimManager.PERMISSION_RESOLVER.canAccess(player, claim)) {
             event.setCanceled(true);
-            if (shouldSendMessage(player)) player.sendSystemMessage(Component.literal("§cЭто чужая территория"));
+            if (shouldSendMessage(player)) player.sendSystemMessage(Component.translatable("message.vsclaims.foreign_territory"));
         }
     }
 
@@ -65,7 +65,7 @@ public class ProtectionEvents {
             event.setCancellationResult(InteractionResult.FAIL);
             event.setUseItem(Event.Result.DENY);
             event.setUseBlock(Event.Result.DENY);
-            if (shouldSendMessage(player)) player.sendSystemMessage(Component.literal("§cНет доступа к использованию блока"));
+            if (shouldSendMessage(player)) player.sendSystemMessage(Component.translatable("message.vsclaims.no_access_use_block"));
         }
     }
 
@@ -96,13 +96,13 @@ public class ProtectionEvents {
         Claim claim = getClaimAtWithMargin(level, event.getPos());
         if (claim != null && !ClaimManager.PERMISSION_RESOLVER.canAccess(player, claim)) {
             event.setCanceled(true);
-            if (shouldSendMessage(player)) player.sendSystemMessage(Component.literal("§cЭто чужая территория"));
+            if (shouldSendMessage(player)) player.sendSystemMessage(Component.translatable("message.vsclaims.foreign_territory"));
             return;
         }
         if (event.getPlacedBlock().getBlock() != ModBlocks.CLAIM_BLOCK.get()) return;
         if (!VSShipUtils.isOnShip(level, event.getPos())) {
             event.setCanceled(true);
-            if (shouldSendMessage(player)) player.sendSystemMessage(Component.literal("§cБлок можно поставить только на корабль!"));
+            if (shouldSendMessage(player)) player.sendSystemMessage(Component.translatable("message.vsclaims.claim_block_only_on_ship"));
         }
     }
 
@@ -115,7 +115,7 @@ public class ProtectionEvents {
         if (claim == null) return;
         if (!ClaimManager.PERMISSION_RESOLVER.canAccess(player, claim)) {
             event.setCanceled(true);
-            if (shouldSendMessage(player)) player.sendSystemMessage(Component.literal("§cЭто чужая территория"));
+            if (shouldSendMessage(player)) player.sendSystemMessage(Component.translatable("message.vsclaims.foreign_territory"));
         }
     }
 }

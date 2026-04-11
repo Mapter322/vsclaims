@@ -97,7 +97,7 @@ public class ClaimBlock extends BaseEntityBlock {
             return InteractionResult.PASS;
 
         if (!serverPlayer.getUUID().equals(claim.getOwner())) {
-            serverPlayer.sendSystemMessage(Component.literal("§cТолько владелец может настраивать доступ"));
+            serverPlayer.sendSystemMessage(Component.translatable("message.vsclaims.only_owner_can_configure"));
             return InteractionResult.CONSUME;
         }
 
@@ -110,7 +110,7 @@ public class ClaimBlock extends BaseEntityBlock {
                                 containerId, inv, pos, claim.getOwner(),
                                 claim.isActive(),
                                 claim.isAllowParty(), claim.isAllowAllies(), claim.isAllowOthers()),
-                        Component.literal("Claim Settings")
+                        Component.translatable("screen.vsclaims.claim_settings.title")
                 ),
                 buf -> {
                     buf.writeBlockPos(pos);
