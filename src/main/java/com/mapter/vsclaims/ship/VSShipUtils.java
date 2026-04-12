@@ -12,7 +12,7 @@ public class VSShipUtils {
     private static final Logger LOGGER = LogManager.getLogger("vsclaims/VSShipUtils");
 
     private static Object getShipWorld(ServerLevel level) throws Exception {
-        java.lang.reflect.Method getWorld = level.getClass().getMethod("getShipObjectWorld");
+        Method getWorld = level.getClass().getMethod("getShipObjectWorld");
         return getWorld.invoke(level);
     }
 
@@ -22,7 +22,7 @@ public class VSShipUtils {
             if (shipWorld == null) return null;
 
             String dimId = level.dimension().location().toString();
-            java.lang.reflect.Method isInShipyard = shipWorld.getClass()
+            Method isInShipyard = shipWorld.getClass()
                     .getMethod("isBlockInShipyard", int.class, int.class, int.class, String.class);
             boolean inShipyard = (boolean) isInShipyard.invoke(
                     shipWorld, pos.getX(), pos.getY(), pos.getZ(), dimId);
@@ -60,7 +60,7 @@ public class VSShipUtils {
             for (Object ship : ships) {
                 try {
                     Object chunkClaim = ship.getClass().getMethod("getChunkClaim").invoke(ship);
-                    for (java.lang.reflect.Method m : chunkClaim.getClass().getMethods()) {
+                    for (Method m : chunkClaim.getClass().getMethods()) {
                         String name = m.getName();
                         if (!name.equals("contains") && !name.equals("containsChunk")) continue;
                         Class<?>[] pt = m.getParameterTypes();
@@ -97,12 +97,6 @@ public class VSShipUtils {
             Object slug = ship.getClass().getMethod("getSlug").invoke(ship);
             return slug == null ? null : slug.toString();
         } catch (ReflectiveOperationException ignored) { return null; }
-    }
-
-    public static void setShipSlug(Object ship, String slug) {
-        if (ship == null || ship instanceof Boolean) return;
-        try { ship.getClass().getMethod("setSlug", String.class).invoke(ship, slug); }
-        catch (ReflectiveOperationException ignored) {}
     }
 
     public static boolean deleteShipById(ServerLevel level, String shipId) {

@@ -21,11 +21,15 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
     private static final int COLOR_TITLE = 0x222222;
     private static final int COLOR_LABEL = 0x555555;
 
+    // Кулдаун хранится статически по позиции блока, выживает при закрытии/открытии GUI
+    private static final java.util.Map<net.minecraft.core.BlockPos, Long> REFRESH_COOLDOWNS =
+            new java.util.HashMap<>();
+    private static final long COOLDOWN_MS = 30_000L;
+
     private Button partyButton;
     private Button alliesButton;
     private Button othersButton;
     private Button refreshButton;
-    private long lastRefreshTime = 0;
     private Object ship;
 
     public ClaimSettingsScreen(ClaimSettingsMenu menu, Inventory inv, Component title) {
@@ -73,10 +77,23 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
         this.refreshButton = Button.builder(Component.translatable("screen.vsclaims.claim_settings.refresh"), btn -> sendRefresh())
                 .bounds(btnX, this.topPos + 90, btnW, 18).build();
 
+        // Восстанавливаем состояние кнопки если кулдаун ещё активен
+        if (isOnCooldown()) {
+            refreshButton.active = false;
+            refreshButton.setMessage(Component.translatable("screen.vsclaims.claim_settings.refresh_wait"));
+        }
+
         this.addRenderableWidget(this.partyButton);
         this.addRenderableWidget(this.alliesButton);
         this.addRenderableWidget(this.othersButton);
         this.addRenderableWidget(this.refreshButton);
+    }
+
+    public void syncFromMenu() {
+        if (partyButton != null) partyButton.setMessage(getPartyText());
+        if (alliesButton != null) alliesButton.setMessage(getAlliesText());
+        if (othersButton != null) othersButton.setMessage(getOthersText());
+        // Кнопку refresh не трогаем, кулдаун продолжает идти
     }
 
     private Component getPartyText() {
@@ -106,14 +123,17 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
         ));
     }
 
+    private boolean isOnCooldown() {
+        Long last = REFRESH_COOLDOWNS.get(menu.getCenter());
+        return last != null && System.currentTimeMillis() - last < COOLDOWN_MS;
+    }
+
     private void sendRefresh() {
-        long now = System.currentTimeMillis();
-        if (now - lastRefreshTime > 30000) {
-            VSClaimsNetwork.CHANNEL.sendToServer(new RefreshClaimPacket(this.menu.getCenter()));
-            lastRefreshTime = now;
-            refreshButton.active = false;
-            refreshButton.setMessage(Component.translatable("screen.vsclaims.claim_settings.refresh_wait"));
-        }
+        if (isOnCooldown()) return;
+        VSClaimsNetwork.CHANNEL.sendToServer(new RefreshClaimPacket(this.menu.getCenter()));
+        REFRESH_COOLDOWNS.put(menu.getCenter(), System.currentTimeMillis());
+        refreshButton.active = false;
+        refreshButton.setMessage(Component.translatable("screen.vsclaims.claim_settings.refresh_wait"));
     }
 
     @Override
@@ -123,8 +143,6 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
 
     @Override
     protected void renderLabels(net.minecraft.client.gui.GuiGraphics g, int mx, int my) {
-        // Координаты относительно угла фона (leftPos/topPos вычтены движком)
-
         // Заголовок по центру
         String title = Component.translatable("screen.vsclaims.claim_settings.title").getString();
         g.drawString(this.font, title,
@@ -181,7 +199,9 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
         super.render(g, mx, my, partialTick);
         this.renderTooltip(g, mx, my);
 
-        if (!refreshButton.active && System.currentTimeMillis() - lastRefreshTime > 30000) {
+        // Снимаем кулдаун через 30 секунд (только если сервер не ответил)
+        if (!refreshButton.active && !isOnCooldown()) {
+            REFRESH_COOLDOWNS.remove(menu.getCenter());
             refreshButton.active = true;
             refreshButton.setMessage(Component.translatable("screen.vsclaims.claim_settings.refresh"));
         }

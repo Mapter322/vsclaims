@@ -1,5 +1,6 @@
 package com.mapter.vsclaims.network;
 
+import com.mapter.vsclaims.claim.Claim;
 import com.mapter.vsclaims.claim.ClaimManager;
 import com.mapter.vsclaims.config.VSClaimsConfig;
 import com.mapter.vsclaims.ship.VSShipUtils;
@@ -8,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.function.Supplier;
 
@@ -33,7 +35,7 @@ public class RefreshClaimPacket {
             ServerPlayer player = ctx.getSender();
             if (player == null) return;
 
-            var claim = ClaimManager.getClaimByCenter(player.serverLevel(), msg.center);
+            Claim claim = ClaimManager.getClaimByCenter(player.serverLevel(), msg.center);
             if (claim == null) return;
 
             if (!player.getUUID().equals(claim.getOwner())) return;
@@ -48,11 +50,24 @@ public class RefreshClaimPacket {
                 int exact = ClaimManager.countShipBlocksExact(player.serverLevel(), msg.center);
                 ClaimManager.deactivateClaim(player.serverLevel(), msg.center);
                 player.sendSystemMessage(Component.translatable("message.vsclaims.ship_too_large", exact, maxSize));
+                // Синхронизируем деактивацию клиенту
+                VSClaimsNetwork.CHANNEL.send(
+                        PacketDistributor.PLAYER.with(() -> player),
+                        new SyncClaimStatePacket(msg.center, false,
+                                claim.isAllowParty(), claim.isAllowAllies(), claim.isAllowOthers())
+                );
                 return;
             }
 
             ClaimManager.refreshClaim(player.serverLevel(), msg.center);
             player.sendSystemMessage(Component.translatable("message.vsclaims.claim_refreshed"));
+
+            // Синхронизируем активацию клиенту в реальном времени
+            VSClaimsNetwork.CHANNEL.send(
+                    PacketDistributor.PLAYER.with(() -> player),
+                    new SyncClaimStatePacket(msg.center, claim.isActive(),
+                            claim.isAllowParty(), claim.isAllowAllies(), claim.isAllowOthers())
+            );
         });
         ctx.setPacketHandled(true);
     }

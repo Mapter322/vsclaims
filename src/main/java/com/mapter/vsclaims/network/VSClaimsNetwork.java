@@ -31,5 +31,9 @@ public class VSClaimsNetwork {
                 RegisterShipPacket::encode,
                 RegisterShipPacket::decode,
                 RegisterShipPacket::handle);
+        CHANNEL.registerMessage(nextId++, SyncClaimStatePacket.class,
+                SyncClaimStatePacket::encode,
+                SyncClaimStatePacket::decode,
+                SyncClaimStatePacket::handle);
     }
 }
