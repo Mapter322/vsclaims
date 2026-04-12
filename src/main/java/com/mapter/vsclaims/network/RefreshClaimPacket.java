@@ -1,6 +1,7 @@
 package com.mapter.vsclaims.network;
 
 import com.mapter.vsclaims.claim.ClaimManager;
+import com.mapter.vsclaims.config.VSClaimsConfig;
 import com.mapter.vsclaims.ship.VSShipUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -39,6 +40,14 @@ public class RefreshClaimPacket {
 
             if (!VSShipUtils.isOnShip(player.serverLevel(), msg.center)) {
                 player.sendSystemMessage(Component.translatable("message.vsclaims.refresh_only_on_ship"));
+                return;
+            }
+
+            int maxSize = VSClaimsConfig.MAX_SHIP_BLOCKS.get();
+            if (ClaimManager.countShipBlocks(player.serverLevel(), msg.center, maxSize) > maxSize) {
+                int exact = ClaimManager.countShipBlocksExact(player.serverLevel(), msg.center);
+                ClaimManager.deactivateClaim(player.serverLevel(), msg.center);
+                player.sendSystemMessage(Component.translatable("message.vsclaims.ship_too_large", exact, maxSize));
                 return;
             }
 

@@ -1,5 +1,6 @@
 package com.mapter.vsclaims.claim;
 
+import com.mapter.vsclaims.config.VSClaimsConfig;
 import com.mapter.vsclaims.permission.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -51,12 +52,81 @@ public class ClaimManager {
     public static void refreshClaim(ServerLevel level, BlockPos center) {
         Claim claim = getClaimByCenter(level, center);
         if (claim != null) {
-            claim.setActive(true);
+            int maxSize = VSClaimsConfig.MAX_SHIP_BLOCKS.get();
+            if (countShipBlocks(level, center, maxSize) > maxSize) {
+                return;
+            }
             Set<BlockPos> newBlocks = floodFill(level, center);
+            claim.setActive(true);
             claim.getClaimedBlocks().clear();
             claim.getClaimedBlocks().addAll(newBlocks);
             ClaimSavedData.get(level).setDirty();
         }
+    }
+
+    public static void deactivateClaim(ServerLevel level, BlockPos center) {
+        Claim claim = getClaimByCenter(level, center);
+        if (claim == null) return;
+        claim.setActive(false);
+        ClaimSavedData.get(level).setDirty();
+    }
+
+    public static int countShipBlocks(ServerLevel level, BlockPos start, int hardLimit) {
+        if (hardLimit <= 0) return 0;
+
+        Set<BlockPos> visited = new HashSet<>();
+        Queue<BlockPos> queue = new LinkedList<>();
+        queue.add(start);
+        visited.add(start);
+
+        int count = 0;
+        while (!queue.isEmpty() && count <= hardLimit) {
+            BlockPos current = queue.poll();
+            if (!level.getBlockState(current).isAir() && !level.getBlockState(current).is(Blocks.WATER)) {
+                count++;
+                if (count > hardLimit) return count;
+            }
+
+            for (Direction dir : Direction.values()) {
+                BlockPos neighbor = current.relative(dir);
+                if (!visited.contains(neighbor)
+                        && !level.getBlockState(neighbor).isAir()
+                        && !level.getBlockState(neighbor).is(Blocks.WATER)) {
+                    visited.add(neighbor);
+                    queue.add(neighbor);
+                }
+            }
+        }
+
+        return count;
+    }
+
+    public static int countShipBlocksExact(ServerLevel level, BlockPos start) {
+        Set<BlockPos> visited = new HashSet<>();
+        Queue<BlockPos> queue = new LinkedList<>();
+
+        queue.add(start);
+        visited.add(start);
+
+        int count = 0;
+        while (!queue.isEmpty()) {
+            BlockPos current = queue.poll();
+            if (!level.getBlockState(current).isAir() && !level.getBlockState(current).is(Blocks.WATER)) {
+                count++;
+            }
+
+            for (Direction dir : Direction.values()) {
+                BlockPos neighbor = current.relative(dir);
+                if (!visited.contains(neighbor)
+                        && !level.getBlockState(neighbor).isAir()
+                        && !level.getBlockState(neighbor).is(Blocks.WATER)) {
+                    visited.add(neighbor);
+                    queue.add(neighbor);
+                }
+            }
+        }
+
+        return count;
     }
 
     private static Set<BlockPos> floodFill(ServerLevel level, BlockPos start) {
@@ -66,7 +136,7 @@ public class ClaimManager {
         queue.add(start);
         visited.add(start);
         claimed.add(start);
-        int maxSize = 10000;
+        int maxSize = VSClaimsConfig.MAX_SHIP_BLOCKS.get();
         while (!queue.isEmpty() && claimed.size() < maxSize) {
             BlockPos current = queue.poll();
             for (Direction dir : Direction.values()) {

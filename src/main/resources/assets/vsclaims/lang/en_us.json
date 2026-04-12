@@ -26,6 +26,7 @@
   "message.vsclaims.only_owner_can_configure": "§cOnly the owner can change access settings",
   "message.vsclaims.refresh_only_on_ship": "§cRefresh is only available on a ship!",
   "message.vsclaims.claim_refreshed": "§aClaim activated and borders refreshed",
+  "message.vsclaims.ship_too_large": "§cShip is too large for this claim. Blocks: %s / %s",
   "message.vsclaims.ship_not_found_at_pos": "§cNo ship found at this position!",
   "message.vsclaims.ship_object_not_found": "§cFailed to get ship object!",
   "message.vsclaims.ship_id_not_found": "§cFailed to get ship ID!",

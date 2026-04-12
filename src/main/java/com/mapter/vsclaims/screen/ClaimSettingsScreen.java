@@ -18,7 +18,6 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
 
     private static final int TEXTURE_SIZE = 180;
 
-    // Тёмный текст на светло-сером фоне, без тени
     private static final int COLOR_TITLE = 0x222222;
     private static final int COLOR_LABEL = 0x555555;
 
@@ -111,7 +110,6 @@ public class ClaimSettingsScreen extends AbstractContainerScreen<ClaimSettingsMe
         long now = System.currentTimeMillis();
         if (now - lastRefreshTime > 30000) {
             VSClaimsNetwork.CHANNEL.sendToServer(new RefreshClaimPacket(this.menu.getCenter()));
-            this.menu.setClaimActive(true);
             lastRefreshTime = now;
             refreshButton.active = false;
             refreshButton.setMessage(Component.translatable("screen.vsclaims.claim_settings.refresh_wait"));

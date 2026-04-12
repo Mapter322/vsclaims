@@ -26,6 +26,7 @@
   "message.vsclaims.only_owner_can_configure": "§cТолько владелец может настраивать доступ",
   "message.vsclaims.refresh_only_on_ship": "§cОбновление доступно только на корабле!",
   "message.vsclaims.claim_refreshed": "§aПриват активирован и границы обновлены",
+  "message.vsclaims.ship_too_large": "§cКорабль превышает размер привата. Блоков: %s / %s",
   "message.vsclaims.ship_not_found_at_pos": "§cКорабль не найден на данной позиции!",
   "message.vsclaims.ship_object_not_found": "§cНе удалось получить объект корабля!",
   "message.vsclaims.ship_id_not_found": "§cНе удалось получить ID корабля!",
