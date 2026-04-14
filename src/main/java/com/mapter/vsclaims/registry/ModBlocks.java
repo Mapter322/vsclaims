@@ -26,7 +26,8 @@ public class ModBlocks {
     public static final RegistryObject<Block> CLAIM_BLOCK =
             BLOCKS.register("claim_block",
                     () -> new ClaimBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
-                            .requiresCorrectToolForDrops()));
+                            .requiresCorrectToolForDrops()
+                            .noOcclusion()));
 
     public static final RegistryObject<Item> CLAIM_BLOCK_ITEM =
             ITEMS.register("claim_block",

@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "vsclaims:block/claim_block"
+    },
+    "facing=south": {
+      "model": "vsclaims:block/claim_block",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "vsclaims:block/claim_block",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "vsclaims:block/claim_block",
+      "y": 270
     }
   }
 }
