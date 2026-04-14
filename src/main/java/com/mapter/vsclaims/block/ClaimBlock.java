@@ -9,6 +9,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -21,6 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraft.world.SimpleMenuProvider;
@@ -29,15 +32,18 @@ import javax.annotation.Nullable;
 
 public class ClaimBlock extends BaseEntityBlock {
 
+    public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
+
     public ClaimBlock(Properties props) {
         super(props);
         this.registerDefaultState(this.stateDefinition.any()
-                .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
+                .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
+                .setValue(OPEN, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
-        builder.add(BlockStateProperties.HORIZONTAL_FACING);
+        builder.add(BlockStateProperties.HORIZONTAL_FACING, OPEN);
     }
 
     @Nullable
@@ -45,7 +51,8 @@ public class ClaimBlock extends BaseEntityBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState()
                 .setValue(BlockStateProperties.HORIZONTAL_FACING,
-                        context.getHorizontalDirection().getOpposite());
+                        context.getHorizontalDirection().getOpposite())
+                .setValue(OPEN, false);
     }
 
     @Override
@@ -119,6 +126,11 @@ public class ClaimBlock extends BaseEntityBlock {
         if (!serverPlayer.getUUID().equals(claim.getOwner())) {
             serverPlayer.sendSystemMessage(Component.translatable("message.vsclaims.only_owner_can_configure"));
             return InteractionResult.CONSUME;
+        }
+
+        if (state.hasProperty(OPEN) && !state.getValue(OPEN)) {
+            level.setBlock(pos, state.setValue(OPEN, true), 3);
+            level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 1.0F, 1.0F);
         }
 
         Object ship = VSShipUtils.getShipAt(serverPlayer.serverLevel(), pos);

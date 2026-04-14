@@ -1,19 +1,12 @@
 {
   "variants": {
-    "facing=north": {
-      "model": "vsclaims:block/claim_block"
-    },
-    "facing=south": {
-      "model": "vsclaims:block/claim_block",
-      "y": 180
-    },
-    "facing=east": {
-      "model": "vsclaims:block/claim_block",
-      "y": 90
-    },
-    "facing=west": {
-      "model": "vsclaims:block/claim_block",
-      "y": 270
-    }
+    "facing=north,open=false": { "model": "vsclaims:block/claim_block" },
+    "facing=south,open=false": { "model": "vsclaims:block/claim_block", "y": 180 },
+    "facing=east,open=false": { "model": "vsclaims:block/claim_block", "y": 90 },
+    "facing=west,open=false": { "model": "vsclaims:block/claim_block", "y": 270 },
+    "facing=north,open=true": { "model": "vsclaims:block/claim_block_open" },
+    "facing=south,open=true": { "model": "vsclaims:block/claim_block_open", "y": 180 },
+    "facing=east,open=true": { "model": "vsclaims:block/claim_block_open", "y": 90 },
+    "facing=west,open=true": { "model": "vsclaims:block/claim_block_open", "y": 270 }
   }
 }

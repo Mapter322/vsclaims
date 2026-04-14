@@ -1,12 +1,15 @@
 package com.mapter.vsclaims.screen;
 
 import com.mapter.vsclaims.registry.ModMenus;
+import com.mapter.vsclaims.block.ClaimBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.UUID;
 
@@ -81,5 +84,17 @@ public class ClaimSettingsMenu extends AbstractContainerMenu {
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         return ItemStack.EMPTY;
+    }
+
+    @Override
+    public void removed(Player player) {
+        Level level = player.level();
+        if (!level.isClientSide) {
+            BlockState state = level.getBlockState(center);
+            if (state.getBlock() instanceof ClaimBlock && state.hasProperty(ClaimBlock.OPEN) && state.getValue(ClaimBlock.OPEN)) {
+                level.setBlock(center, state.setValue(ClaimBlock.OPEN, false), 3);
+            }
+        }
+        super.removed(player);
     }
 }
