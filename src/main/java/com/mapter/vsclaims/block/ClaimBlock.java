@@ -2,6 +2,7 @@ package com.mapter.vsclaims.block;
 
 import com.mapter.vsclaims.claim.Claim;
 import com.mapter.vsclaims.claim.ClaimManager;
+import com.mapter.vsclaims.claim.ShipClaimManager;
 import com.mapter.vsclaims.ship.RegisteredShipsManager;
 import com.mapter.vsclaims.ship.UnregisteredShipsManager;
 import com.mapter.vsclaims.ship.VSShipUtils;
@@ -72,6 +73,7 @@ public class ClaimBlock extends BaseEntityBlock {
                             net.minecraft.world.item.ItemStack stack) {
 
         if (!level.isClientSide && placer instanceof Player player) {
+
             ClaimManager.addClaim((ServerLevel) level, pos, player.getUUID());
 
             Object ship = VSShipUtils.getShipAt((ServerLevel) level, pos);
@@ -105,6 +107,13 @@ public class ClaimBlock extends BaseEntityBlock {
                 RegisteredShipsManager.unregisterShip(shipId);
                 UnregisteredShipsManager.addShip(shipId, shipName);
             }
+
+            // Release ship claim
+            Claim claim = ClaimManager.getClaimByCenter((ServerLevel) level, pos);
+            if (claim != null && claim.isActive()) {
+                ShipClaimManager.releaseShipClaimSlot((ServerLevel) level, claim.getOwner());
+            }
+
             ClaimManager.removeClaim((ServerLevel) level, pos);
         }
         super.onRemove(state, level, pos, newState, moving);

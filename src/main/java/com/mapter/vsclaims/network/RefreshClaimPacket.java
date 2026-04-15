@@ -2,6 +2,7 @@ package com.mapter.vsclaims.network;
 
 import com.mapter.vsclaims.claim.Claim;
 import com.mapter.vsclaims.claim.ClaimManager;
+import com.mapter.vsclaims.claim.ShipClaimManager;
 import com.mapter.vsclaims.config.VSClaimsConfig;
 import com.mapter.vsclaims.ship.VSShipUtils;
 import net.minecraft.core.BlockPos;
@@ -50,7 +51,7 @@ public class RefreshClaimPacket {
                 int exact = ClaimManager.countShipBlocksExact(player.serverLevel(), msg.center);
                 ClaimManager.deactivateClaim(player.serverLevel(), msg.center);
                 player.sendSystemMessage(Component.translatable("message.vsclaims.ship_too_large", exact, maxSize));
-                // Синхронизируем деактивацию клиенту
+                // Sync deactivation to client
                 VSClaimsNetwork.CHANNEL.send(
                         PacketDistributor.PLAYER.with(() -> player),
                         new SyncClaimStatePacket(msg.center, false,
@@ -59,10 +60,20 @@ public class RefreshClaimPacket {
                 return;
             }
 
+            // If claim is not yet active — need to consume ship claim
+            if (!claim.isActive()) {
+                boolean consumed = ShipClaimManager.consumeShipClaimSlot(
+                        player.serverLevel(), player.getUUID());
+                if (!consumed) {
+                    player.sendSystemMessage(Component.translatable("message.vsclaims.no_ship_slots"));
+                    return;
+                }
+            }
+
             ClaimManager.refreshClaim(player.serverLevel(), msg.center);
             player.sendSystemMessage(Component.translatable("message.vsclaims.claim_refreshed"));
 
-            // Синхронизируем активацию клиенту в реальном времени
+            // Sync activation to client in real time
             VSClaimsNetwork.CHANNEL.send(
                     PacketDistributor.PLAYER.with(() -> player),
                     new SyncClaimStatePacket(msg.center, claim.isActive(),

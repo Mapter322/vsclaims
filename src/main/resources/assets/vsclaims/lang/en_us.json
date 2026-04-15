@@ -16,8 +16,16 @@
   "screen.vsclaims.claim_settings.ship": "Ship: %s",
   "commands.vsclaims.only_player": "This command can only be used by a player",
   "commands.vsclaims.info.registered_count": "Your claimed ships: %s",
+  "commands.vsclaims.info.ship_slots": "Ship claims: %s / %s",
   "commands.vsclaims.info.empty": "List is empty",
   "commands.vsclaims.info.entry": "- %s",
+  "commands.vsclaims.claim_info.slots": "Ship claims: %s / %s",
+  "commands.vsclaims.claim_info.opac_free": "Free OPAC claims (available for transfer): %s",
+  "commands.vsclaims.claim_info.opac_unavailable": "§7OPAC is not available",
+  "commands.vsclaims.transfer.success": "Successfully transferred %s claim(s). Ship claims: %s / %s",
+  "commands.vsclaims.transfer.opac_not_loaded": "§cOpen Parties and Claims is not loaded",
+  "commands.vsclaims.transfer.not_enough": "§cNot enough free OPAC claims. Free: %s, requested: %s",
+  "commands.vsclaims.transfer.error": "§cAn error occurred while transferring claims",
   "commands.vsclaims.ships.clear.none": "There are no unregistered ships",
   "commands.vsclaims.ships.clear.done": "Clearing unregistered ships finished. Deleted: %s, failed: %s, total: %s",
   "message.vsclaims.foreign_territory": "§cThis is someone else's territory",
@@ -30,5 +38,6 @@
   "message.vsclaims.ship_not_found_at_pos": "§cNo ship found at this position!",
   "message.vsclaims.ship_object_not_found": "§cFailed to get ship object!",
   "message.vsclaims.ship_id_not_found": "§cFailed to get ship ID!",
+  "message.vsclaims.no_ship_slots": "§cYou have no available ship claims! Use /vsclaims claim transfer ship <amount> to transfer claims",
   "message.vsclaims.ship_registered": "Ship claimed: %s"
 }
