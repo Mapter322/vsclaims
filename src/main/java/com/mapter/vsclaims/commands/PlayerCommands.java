@@ -119,7 +119,47 @@ public class PlayerCommands {
                                                             }
 
                                                             return result == ShipClaimManager.TransferResult.SUCCESS ? 1 : 0;
-                                                        })))))
+                                                        })))
+
+                                // /vsclaims claim transfer opac <amount>
+                                .then(Commands.literal("opac")
+                                        .then(Commands.argument("amount", IntegerArgumentType.integer(1))
+                                                .executes(ctx -> {
+                                                    CommandSourceStack source = ctx.getSource();
+                                                    if (!(source.getEntity() instanceof ServerPlayer player)) {
+                                                        source.sendFailure(Component.translatable("commands.vsclaims.only_player"));
+                                                        return 0;
+                                                    }
+
+                                                    int amount = IntegerArgumentType.getInteger(ctx, "amount");
+                                                    int freeShipClaims = ShipClaimManager.getFreeSlots(player.serverLevel(), player.getUUID());
+
+                                                    ShipClaimManager.TransferResult result =
+                                                            ShipClaimManager.transferToOpac(player, amount);
+
+                                                    switch (result) {
+                                                        case SUCCESS -> {
+                                                            UUID playerId = player.getUUID();
+                                                            int newMigrated = ShipClaimManager.getMigratedSlots(player.serverLevel(), playerId);
+                                                            int newUsed     = ShipClaimManager.getUsedSlots(player.serverLevel(), playerId);
+                                                            source.sendSuccess(() -> Component.translatable(
+                                                                    "commands.vsclaims.transfer_back.success",
+                                                                    amount, newUsed, newMigrated
+                                                            ), false);
+                                                        }
+                                                        case OPAC_NOT_LOADED ->
+                                                                source.sendFailure(Component.translatable("commands.vsclaims.transfer.opac_not_loaded"));
+                                                        case NOT_ENOUGH_FREE ->
+                                                                source.sendFailure(Component.translatable(
+                                                                        "commands.vsclaims.transfer_back.not_enough",
+                                                                        freeShipClaims, amount
+                                                                ));
+                                                        case API_ERROR ->
+                                                                source.sendFailure(Component.translatable("commands.vsclaims.transfer.error"));
+                                                    }
+
+                                                    return result == ShipClaimManager.TransferResult.SUCCESS ? 1 : 0;
+                                                })))))
 
         );
     }

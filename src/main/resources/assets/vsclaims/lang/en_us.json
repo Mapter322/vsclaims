@@ -26,6 +26,8 @@
   "commands.vsclaims.transfer.opac_not_loaded": "§cOpen Parties and Claims is not loaded",
   "commands.vsclaims.transfer.not_enough": "§cNot enough free OPAC claims. Free: %s, requested: %s",
   "commands.vsclaims.transfer.error": "§cAn error occurred while transferring claims",
+  "commands.vsclaims.transfer_back.success": "Successfully transferred %s claim(s) to OPAC. Ship claims: %s / %s",
+  "commands.vsclaims.transfer_back.not_enough": "§cNot enough free ship claims. Free: %s, requested: %s",
   "commands.vsclaims.ships.clear.none": "There are no unregistered ships",
   "commands.vsclaims.ships.clear.done": "Clearing unregistered ships finished. Deleted: %s, failed: %s, total: %s",
   "message.vsclaims.foreign_territory": "§cThis is someone else's territory",

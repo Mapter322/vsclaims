@@ -96,7 +96,7 @@ public class ShipClaimManager {
         data.decrementUsedSlots(playerId);
     }
 
-     //Get the number of migrated claims (maximum).
+     //Get the number of transferred claims (maximum).
     public static int getMigratedSlots(ServerLevel level, UUID playerId) {
         return ShipClaimSavedData.get(level).getMigratedSlots(playerId);
     }
@@ -137,6 +137,53 @@ public class ShipClaimManager {
         } catch (Exception e) {
             LOGGER.error("[VSClaims] getFreeOpacClaims: exception", e);
             return -1;
+        }
+    }
+
+    //Transfer ship claims back to OPAC bonus claims.
+    //Only free ship claims (transferred - used) can be transferred back.
+    public static TransferResult transferToOpac(ServerPlayer player, int amount) {
+        if (amount <= 0) return TransferResult.API_ERROR;
+
+        try {
+            OpenPACServerAPI api = OpenPACServerAPI.get(player.server);
+            if (api == null) return TransferResult.OPAC_NOT_LOADED;
+
+            UUID playerId = player.getUUID();
+
+            IServerClaimsManagerAPI claimsManager = api.getServerClaimsManager();
+            IPlayerConfigManagerAPI configManager = api.getPlayerConfigs();
+
+            if (claimsManager == null || configManager == null) return TransferResult.OPAC_NOT_LOADED;
+
+            IPlayerConfigAPI config = configManager.getLoadedConfig(playerId);
+            if (config == null) return TransferResult.API_ERROR;
+
+            ShipClaimSavedData data = ShipClaimSavedData.get(player.serverLevel());
+            int freeShipClaims = data.getFreeSlots(playerId);
+
+            if (freeShipClaims < amount) {
+                return TransferResult.NOT_ENOUGH_FREE;
+            }
+
+            // Decrease transferred slots in our mod
+            int currentMigrated = data.getMigratedSlots(playerId);
+            data.setMigratedSlots(playerId, currentMigrated - amount);
+
+            // Increase BONUS_CHUNK_CLAIMS in OPAC
+            int bonusLimit = config.getRaw(PlayerConfigOptions.BONUS_CHUNK_CLAIMS);
+            int newBonus = bonusLimit + amount;
+            IPlayerConfigAPI.SetResult setResult = config.tryToSet(PlayerConfigOptions.BONUS_CHUNK_CLAIMS, newBonus);
+            if (setResult != IPlayerConfigAPI.SetResult.SUCCESS) {
+                // Rollback on failure
+                data.setMigratedSlots(playerId, currentMigrated);
+                return TransferResult.API_ERROR;
+            }
+
+            return TransferResult.SUCCESS;
+        } catch (Exception e) {
+            LOGGER.error("[VSClaims] transfer back: exception during transfer to OPAC", e);
+            return TransferResult.API_ERROR;
         }
     }
 }

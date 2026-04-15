@@ -26,6 +26,8 @@
   "commands.vsclaims.transfer.opac_not_loaded": "§cOpen Parties and Claims не загружен",
   "commands.vsclaims.transfer.not_enough": "§cНедостаточно свободных приватов OPAC. Свободно: %s, запрошено: %s",
   "commands.vsclaims.transfer.error": "§cПроизошла ошибка при переносе приватов",
+  "commands.vsclaims.transfer_back.success": "Успешно перенесено %s приват(ов) в OPAC. Приваты кораблей: %s / %s",
+  "commands.vsclaims.transfer_back.not_enough": "§cНедостаточно свободных приватов кораблей. Свободно: %s, запрошено: %s",
   "commands.vsclaims.ships.clear.none": "Незарегистрированных кораблей нет",
   "commands.vsclaims.ships.clear.done": "Удаление незарегистрированных кораблей завершено. Удалено: %s, не удалось удалить: %s, всего было: %s",
   "message.vsclaims.foreign_territory": "§cЭто чужая территория",
