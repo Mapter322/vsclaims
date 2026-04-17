@@ -2,7 +2,7 @@ package com.mapter.vsclaims.network;
 
 import com.mapter.vsclaims.claim.Claim;
 import com.mapter.vsclaims.claim.ClaimManager;
-import com.mapter.vsclaims.claim.ShipClaimManager;
+import com.mapter.vsclaims.claim.VsClaimManager;
 import com.mapter.vsclaims.config.VSClaimsConfig;
 import com.mapter.vsclaims.ship.VSShipUtils;
 import net.minecraft.core.BlockPos;
@@ -62,7 +62,7 @@ public class RefreshClaimPacket {
 
             // If claim is not yet active — need to consume ship claim
             if (!claim.isActive()) {
-                boolean consumed = ShipClaimManager.consumeShipClaimSlot(
+                boolean consumed = VsClaimManager.consumeShipClaimSlot(
                         player.serverLevel(), player.getUUID());
                 if (!consumed) {
                     player.sendSystemMessage(Component.translatable("message.vsclaims.no_ship_slots"));

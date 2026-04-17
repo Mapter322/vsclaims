@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class ShipClaimSavedData extends SavedData {
+public class VsClaimSavedData extends SavedData {
 
     private static final String DATA_NAME = "vsclaims_ship_slots";
 
@@ -20,18 +20,18 @@ public class ShipClaimSavedData extends SavedData {
     // Player UUID -> number of used claims (active claim blocks)
     private final Map<UUID, Integer> usedSlots = new HashMap<>();
 
-    public static ShipClaimSavedData get(ServerLevel level) {
+    public static VsClaimSavedData get(ServerLevel level) {
         // Use overworld to make data global for the server
         ServerLevel overworld = level.getServer().overworld();
         return overworld.getDataStorage().computeIfAbsent(
-                ShipClaimSavedData::load,
-                ShipClaimSavedData::new,
+                VsClaimSavedData::load,
+                VsClaimSavedData::new,
                 DATA_NAME
         );
     }
 
-    public static ShipClaimSavedData load(CompoundTag tag) {
-        ShipClaimSavedData data = new ShipClaimSavedData();
+    public static VsClaimSavedData load(CompoundTag tag) {
+        VsClaimSavedData data = new VsClaimSavedData();
 
         ListTag migrated = tag.getList("migrated", Tag.TAG_COMPOUND);
         for (Tag t : migrated) {

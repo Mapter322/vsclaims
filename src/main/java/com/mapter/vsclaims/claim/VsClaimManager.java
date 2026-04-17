@@ -15,9 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class ShipClaimManager {
+public class VsClaimManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShipClaimManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(VsClaimManager.class);
 
     public enum TransferResult {
         SUCCESS,
@@ -67,7 +67,7 @@ public class ShipClaimManager {
             }
 
             // Add claims to our mod
-            ShipClaimSavedData data = ShipClaimSavedData.get(player.serverLevel());
+            VsClaimSavedData data = VsClaimSavedData.get(player.serverLevel());
             data.addMigratedSlots(playerId, amount);
 
             return TransferResult.SUCCESS;
@@ -81,7 +81,7 @@ public class ShipClaimManager {
      //Attempts to consume 1 ship claim (on claim block activation).
      //Returns true if the claim was successfully consumed.
     public static boolean consumeShipClaimSlot(ServerLevel level, UUID playerId) {
-        ShipClaimSavedData data = ShipClaimSavedData.get(level);
+        VsClaimSavedData data = VsClaimSavedData.get(level);
         if (data.getFreeSlots(playerId) <= 0) {
             return false;
         }
@@ -92,23 +92,23 @@ public class ShipClaimManager {
 
      //Release 1 ship claim (on claim block removal).
     public static void releaseShipClaimSlot(ServerLevel level, UUID playerId) {
-        ShipClaimSavedData data = ShipClaimSavedData.get(level);
+        VsClaimSavedData data = VsClaimSavedData.get(level);
         data.decrementUsedSlots(playerId);
     }
 
      //Get the number of transferred claims (maximum).
     public static int getMigratedSlots(ServerLevel level, UUID playerId) {
-        return ShipClaimSavedData.get(level).getMigratedSlots(playerId);
+        return VsClaimSavedData.get(level).getMigratedSlots(playerId);
     }
 
      //Get the number of used claims.
     public static int getUsedSlots(ServerLevel level, UUID playerId) {
-        return ShipClaimSavedData.get(level).getUsedSlots(playerId);
+        return VsClaimSavedData.get(level).getUsedSlots(playerId);
     }
 
      //Get the number of free claims.
     public static int getFreeSlots(ServerLevel level, UUID playerId) {
-        return ShipClaimSavedData.get(level).getFreeSlots(playerId);
+        return VsClaimSavedData.get(level).getFreeSlots(playerId);
     }
 
 
@@ -159,7 +159,7 @@ public class ShipClaimManager {
             IPlayerConfigAPI config = configManager.getLoadedConfig(playerId);
             if (config == null) return TransferResult.API_ERROR;
 
-            ShipClaimSavedData data = ShipClaimSavedData.get(player.serverLevel());
+            VsClaimSavedData data = VsClaimSavedData.get(player.serverLevel());
             int freeShipClaims = data.getFreeSlots(playerId);
 
             if (freeShipClaims < amount) {

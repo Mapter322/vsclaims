@@ -2,7 +2,7 @@ package com.mapter.vsclaims.block;
 
 import com.mapter.vsclaims.claim.Claim;
 import com.mapter.vsclaims.claim.ClaimManager;
-import com.mapter.vsclaims.claim.ShipClaimManager;
+import com.mapter.vsclaims.claim.VsClaimManager;
 import com.mapter.vsclaims.ship.RegisteredShipsManager;
 import com.mapter.vsclaims.ship.UnregisteredShipsManager;
 import com.mapter.vsclaims.ship.VSShipUtils;
@@ -111,7 +111,7 @@ public class ClaimBlock extends BaseEntityBlock {
             // Release ship claim
             Claim claim = ClaimManager.getClaimByCenter((ServerLevel) level, pos);
             if (claim != null && claim.isActive()) {
-                ShipClaimManager.releaseShipClaimSlot((ServerLevel) level, claim.getOwner());
+                VsClaimManager.releaseShipClaimSlot((ServerLevel) level, claim.getOwner());
             }
 
             ClaimManager.removeClaim((ServerLevel) level, pos);
