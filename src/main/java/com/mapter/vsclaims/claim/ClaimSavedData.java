@@ -41,6 +41,9 @@ public class ClaimSavedData extends SavedData {
                     c.getBoolean("allowAllies"),
                     c.contains("allowOthers") && c.getBoolean("allowOthers")
             ));
+            if (c.contains("shipId")) {
+                data.claims.get(data.claims.size() - 1).setShipId(c.getString("shipId"));
+            }
         }
         return data;
     }
@@ -65,6 +68,7 @@ public class ClaimSavedData extends SavedData {
                 blocks.add(b);
             }
             c.put("claimedBlocks", blocks);
+            if (claim.getShipId() != null) c.putString("shipId", claim.getShipId());
             c.putBoolean("active", claim.isActive());
             c.putBoolean("allowParty", claim.isAllowParty());
             c.putBoolean("allowAllies", claim.isAllowAllies());

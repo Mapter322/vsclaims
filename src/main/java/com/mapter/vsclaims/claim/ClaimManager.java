@@ -49,6 +49,14 @@ public class ClaimManager {
         return null;
     }
 
+    public static Claim getClaimByShipId(ServerLevel level, String shipId) {
+        if (shipId == null) return null;
+        for (Claim claim : ClaimSavedData.get(level).getClaims()) {
+            if (shipId.equals(claim.getShipId())) return claim;
+        }
+        return null;
+    }
+
     public static void refreshClaim(ServerLevel level, BlockPos center) {
         Claim claim = getClaimByCenter(level, center);
         if (claim != null) {

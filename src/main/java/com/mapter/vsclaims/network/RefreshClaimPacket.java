@@ -2,6 +2,7 @@ package com.mapter.vsclaims.network;
 
 import com.mapter.vsclaims.claim.Claim;
 import com.mapter.vsclaims.claim.ClaimManager;
+import com.mapter.vsclaims.claim.ClaimSavedData;
 import com.mapter.vsclaims.claim.VsClaimManager;
 import com.mapter.vsclaims.config.VSClaimsConfig;
 import com.mapter.vsclaims.ship.RegisteredShipsManager;
@@ -86,6 +87,8 @@ public class RefreshClaimPacket {
                 if (shipName == null) shipName = "ship";
                 RegisteredShipsManager.registerShip(shipId, shipName, player.getUUID(), player.getName().getString());
                 UnregisteredShipsManager.removeShip(shipId);
+                claim.setShipId(shipId);
+                ClaimSavedData.get(player.serverLevel()).setDirty();
             }
 
             // Sync activation to client in real time

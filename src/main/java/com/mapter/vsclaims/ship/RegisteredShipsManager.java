@@ -128,6 +128,10 @@ public class RegisteredShipsManager {
         saveRegisteredShips();
     }
 
+    public static ShipRegistration getRegistration(String shipId) {
+        return registeredShips.get(shipId);
+    }
+
     public static String getRegisteredName(String shipId) {
         ShipRegistration reg = registeredShips.get(shipId);
         return reg == null ? null : reg.name;

@@ -1,6 +1,10 @@
 package com.mapter.vsclaims.ship;
 
+import com.mapter.vsclaims.claim.Claim;
+import com.mapter.vsclaims.claim.ClaimManager;
+import com.mapter.vsclaims.claim.VsClaimManager;
 import net.minecraft.server.level.ServerLevel;
+import java.util.UUID;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -110,6 +114,30 @@ public class VSShipEventHandler {
                 LOGGER.info("Корабль исчез из мира, удалён из незарегистрированных: {}", shipId);
             }
 
+
+            // Clean up registered ships deleted via VS
+            java.util.List<String> registeredIds = new java.util.ArrayList<>(RegisteredShipsManager.getAllRegisteredShips().keySet());
+            for (String registeredShipId : registeredIds) {
+                if (currentShipIds.contains(registeredShipId)) continue;
+                RegisteredShipsManager.ShipRegistration reg = RegisteredShipsManager.getRegistration(registeredShipId);
+                RegisteredShipsManager.unregisterShip(registeredShipId);
+                knownShipIds.remove(registeredShipId);
+                if (reg != null && reg.ownerUuid != null) {
+                    try {
+                        UUID ownerId = UUID.fromString(reg.ownerUuid);
+                        Claim claim = ClaimManager.getClaimByShipId(level, registeredShipId);
+                        if (claim != null && claim.isActive()) {
+                            VsClaimManager.releaseShipClaimSlot(level, ownerId);
+                        }
+                        if (claim != null) {
+                            ClaimManager.removeClaim(level, claim.getCenter());
+                        }
+                    } catch (Exception ex) {
+                        LOGGER.warn("cleanupRegistered: {}", ex.toString());
+                    }
+                }
+                LOGGER.info("Registered ship deleted via VS, cleaned up: {}", registeredShipId);
+            }
         } catch (Exception e) {
             LOGGER.warn("checkForNewShips: {}", e.toString());
         }

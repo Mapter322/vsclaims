@@ -14,6 +14,7 @@ public class Claim {
     private boolean allowParty;
     private boolean allowAllies;
     private boolean allowOthers;
+    private String shipId;
 
     public Claim(BlockPos center, UUID owner, Set<BlockPos> claimedBlocks) {
         this.center = center;
@@ -44,6 +45,10 @@ public class Claim {
         this.allowAllies = allowAllies;
         this.allowOthers = allowOthers;
     }
+
+    public String getShipId() { return shipId; }
+
+    public void setShipId(String shipId) { this.shipId = shipId; }
 
     public boolean contains(BlockPos pos) {
         return active && claimedBlocks.contains(pos);
