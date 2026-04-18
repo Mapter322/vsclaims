@@ -4,6 +4,8 @@ import com.mapter.vsclaims.claim.Claim;
 import com.mapter.vsclaims.claim.ClaimManager;
 import com.mapter.vsclaims.claim.VsClaimManager;
 import com.mapter.vsclaims.config.VSClaimsConfig;
+import com.mapter.vsclaims.ship.RegisteredShipsManager;
+import com.mapter.vsclaims.ship.UnregisteredShipsManager;
 import com.mapter.vsclaims.ship.VSShipUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -49,6 +51,9 @@ public class RefreshClaimPacket {
             int maxSize = VSClaimsConfig.MAX_SHIP_BLOCKS.get();
             if (ClaimManager.countShipBlocks(player.serverLevel(), msg.center, maxSize) > maxSize) {
                 int exact = ClaimManager.countShipBlocksExact(player.serverLevel(), msg.center);
+                if (claim.isActive()) {
+                    VsClaimManager.releaseShipClaimSlot(player.serverLevel(), claim.getOwner());
+                }
                 ClaimManager.deactivateClaim(player.serverLevel(), msg.center);
                 player.sendSystemMessage(Component.translatable("message.vsclaims.ship_too_large", exact, maxSize));
                 // Sync deactivation to client
@@ -72,6 +77,16 @@ public class RefreshClaimPacket {
 
             ClaimManager.refreshClaim(player.serverLevel(), msg.center);
             player.sendSystemMessage(Component.translatable("message.vsclaims.claim_refreshed"));
+
+            Object ship = VSShipUtils.getShipAt(player.serverLevel(), msg.center);
+            if (ship instanceof Boolean) ship = VSShipUtils.getShipObjectAt(player.serverLevel(), msg.center);
+            String shipId = VSShipUtils.getShipId(ship);
+            if (shipId != null) {
+                String shipName = VSShipUtils.getShipSlug(ship);
+                if (shipName == null) shipName = "ship";
+                RegisteredShipsManager.registerShip(shipId, shipName, player.getUUID(), player.getName().getString());
+                UnregisteredShipsManager.removeShip(shipId);
+            }
 
             // Sync activation to client in real time
             VSClaimsNetwork.CHANNEL.send(

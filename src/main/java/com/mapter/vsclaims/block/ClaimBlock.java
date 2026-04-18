@@ -73,21 +73,7 @@ public class ClaimBlock extends BaseEntityBlock {
                             net.minecraft.world.item.ItemStack stack) {
 
         if (!level.isClientSide && placer instanceof Player player) {
-
             ClaimManager.addClaim((ServerLevel) level, pos, player.getUUID());
-
-            Object ship = VSShipUtils.getShipAt((ServerLevel) level, pos);
-            if (ship instanceof Boolean) {
-                ship = VSShipUtils.getShipObjectAt((ServerLevel) level, pos);
-            }
-
-            String shipId = VSShipUtils.getShipId(ship);
-            if (shipId != null) {
-                String shipName = VSShipUtils.getShipSlug(ship);
-                if (shipName == null) shipName = "ship";
-                RegisteredShipsManager.registerShip(shipId, shipName, player.getUUID(), player.getName().getString());
-                UnregisteredShipsManager.removeShip(shipId);
-            }
         }
     }
 
